@@ -4,11 +4,13 @@ namespace JeffersonGoncalves\Testimonial\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use JeffersonGoncalves\PestPluginDatabaseMigrations\LoadsPackageMigrations;
 use JeffersonGoncalves\Testimonial\TestimonialServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {
+    use LoadsPackageMigrations;
     use RefreshDatabase;
 
     protected function setUp(): void
@@ -70,20 +72,6 @@ abstract class TestCase extends Orchestra
 
     protected function defineDatabaseMigrations(): void
     {
-        $stubsPath = __DIR__.'/../database/migrations';
-        $tempPath = sys_get_temp_dir().'/laravel-testimonial-migrations';
-
-        if (! is_dir($tempPath)) {
-            mkdir($tempPath, 0755, true);
-        }
-
-        foreach (glob($stubsPath.'/*.php.stub') as $stub) {
-            $filename = basename(str_replace('.php.stub', '.php', $stub));
-            $target = $tempPath.'/'.$filename;
-
-            copy($stub, $target);
-        }
-
-        $this->loadMigrationsFrom($tempPath);
+        $this->loadPackageMigrations(TestimonialServiceProvider::class);
     }
 }
